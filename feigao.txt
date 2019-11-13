@@ -1,0 +1,20 @@
+// Mettre en place un contexte de rendu de l’écran
+    SDL_Renderer* ecran;
+    ecran = SDL_CreateRenderer(fenetre, -1, SDL_RENDERER_ACCELERATED);
+    
+    // Charger l’image
+    SDL_Texture* fond = charger_image("fond.bmp", ecran );
+    
+    // Boucle principale
+    while(!terminer)
+    {
+        SDL_RenderClear(ecran);
+        SDL_RenderCopy(ecran, fond, NULL, NULL);
+        
+        SDL_RenderPresent(ecran);
+        
+    }
+    
+    // Libération de l’écran (renderer)
+    SDL_DestroyRenderer(ecran);
+# jeu-de-programmation-avance
