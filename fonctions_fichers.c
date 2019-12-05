@@ -51,7 +51,7 @@ void taille_fichier(const char* nomFichier,int* nbLig, int* nbCol){
     fp=fopen(nomFichier,"r");
     do
     {
-            if(c=='\n')
+            if(c=='\n'||c==EOF)
             {
             
                 if(j>*nbCol)
