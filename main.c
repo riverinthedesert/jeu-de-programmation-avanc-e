@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include "fonctions_fichers.h"
@@ -8,9 +9,86 @@
 #include <SDL2/SDL_image.h>
 
 
+/**
+    * \brief La fonction rafrachit l'écran en fonction de touche de clavier
+    * \param abs abscisse de hunter 
+    * \param ord ordonne de hunter
+    */
+    void refresh_graphics(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_hunter){
+    if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
+    {
+        switch(dir)
+                {
+                     case 'h':
+                         *ord=*ord+64; 
+                                     break;
+                     case 'b':
+                         *ord=*ord-64; 
+                                     break;
+                     case 'g':
+                         *abs=*abs+64; 
+                                     break;
+                     case 'd':
+                         *abs=*abs-64;
+                                    break;
+                    
+                 }
+    }
+    (*DestR_hunter).x =*abs;
+    (*DestR_hunter).y =*ord;
+    }
+    
+/**
+    * \brief monster deplace automatique
+    * \param abs abscisse de hunter 
+    * \param ord ordonne de hunter
+    */
+    void move_monster(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_monster){
+        int t=rand()%4;
+        switch(t)
+                {
+                     case 0:
+                         *abs=*abs-64; 
+                         dir='g';
+                                     break;
+                     case 1:
+                         *ord=*ord-64; 
+                         dir='h';
+                                     break;
+                     case 2:
+                         *abs=*abs+64; 
+                         dir='d';
+                                     break;
+                     case 3:
+                         *ord=*ord+64; 
+                         dir='b';
+                                    break;
+                 }
+        
+            if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
+            {
+                switch(dir)
+                    {
+                     case 'h':
+                         *ord=*ord+64; 
+                                     break;
+                     case 'b':
+                         *ord=*ord-64; 
+                                     break;
+                     case 'g':
+                         *abs=*abs+64; 
+                                     break;
+                     case 'd':
+                         *abs=*abs-64;
+                                    break;
+                    }
+            }
+        (*DestR_monster).x =*abs;
+        (*DestR_monster).y =*ord;
+        }
+
 
 int main(){
-    //ex1
     int nbLig=0;
     int nbCol=0;
     char** G=allouer_tab_2D(nbLig,nbCol);
@@ -19,9 +97,15 @@ int main(){
     
     int abs=64;//abscisse de hunter 
     int ord=64;//ordonne de hunter
-//     char dir;//direction de hunter
+    char dir; // quartre option g: gauche h:haut d:droite b:bas
     
-    //ex3
+    int abs1=640;
+    int ord1=640;
+    char dir1='d';
+    srand(time(NULL));// Initialization
+    // quartre option t=0: gauche t=1:haut t=2:droite t=3:bas
+    
+    
     SDL_Window* fenetre;  // Déclaration de la fenêtre
     SDL_Event evenements; // Événements liés à la fenêtre
     bool terminer = false;
@@ -64,6 +148,7 @@ int main(){
     Uint8 r = 255, g = 255, b = 255;
     SDL_Texture* pavage= charger_image_transparente("pavage.bmp", ecran,r,g,b);   
     SDL_Texture* hunter= charger_image_transparente("hunter.bmp", ecran,r,g,b); 
+    SDL_Texture* monster= charger_image_transparente("eldritch.bmp", ecran,r,g,b); 
     SDL_Rect SrcR_pavage[13][15];
      for(int i=0; i<13; i++)
     {
@@ -97,32 +182,17 @@ int main(){
     DestR_hunter.y =ord;
     DestR_hunter.w = 64; // Largeur du hunter
     DestR_hunter.h = 64; // Hauteur du hunter
-    
-    /**
-    * \brief La fonction rafrachit l'écran en fonction de touche de clavier
-    * \param abs abscisse de hunter 
-    * \param ord ordonne de hunter
-    */
-    void refresh_graphics(int abs,int ord){
-    if(abs<64)
-        {
-            abs=64;
-        }
-    if(abs>896)
-        {
-            abs=896;
-        }
-    if(ord<64)
-        {
-            ord=64;
-        }
-    if(ord>704)
-        {
-            ord=704;
-        }
-    DestR_hunter.x =abs;
-    DestR_hunter.y =ord;
-    }
+    SDL_Rect SrcR_monster;
+    SrcR_monster.x = 0;
+    SrcR_monster.y = 0;
+    SrcR_monster.w = 236; // Largeur du monster
+    SrcR_monster.h = 236; // Hauteur du monster
+    SDL_Rect DestR_monster;
+    DestR_monster.x =abs1;
+    DestR_monster.y =ord1;
+    DestR_monster.w = 64; // Largeur du monster
+    DestR_monster.h = 64; // Hauteur du monster
+
     
     
     
@@ -131,7 +201,10 @@ int main(){
     // Boucle principale
     while(!terminer)
     {
+        // chrono début
+        
         while( SDL_PollEvent( &evenements ) )
+        {
             switch(evenements.type)
             {
                 case SDL_QUIT:terminer = true; 
@@ -142,22 +215,31 @@ int main(){
                 {
                      case SDLK_UP:
                          ord=ord-64; 
+                         dir='h';
                                      break;
                      case SDLK_DOWN:
                          ord=ord+64; 
+                         dir='b';
                                      break;
                      case SDLK_LEFT:
                          abs=abs-64; 
+                         dir='g';
                                      break;
                      case SDLK_RIGHT:
                          abs=abs+64;
+                         dir='d';
                                     break;
                      case SDLK_q:
                          terminer = true;  break;
                     
                  }
+                     default : 
+                     break;
             }
-        refresh_graphics(abs,ord);
+        }
+        
+        move_monster(&abs1,&ord1,dir1,G,G2,&DestR_monster);
+        refresh_graphics(&abs,&ord,dir,G,G2,&DestR_hunter);
         SDL_RenderClear(ecran);
         SDL_RenderCopy(ecran,fond,NULL,NULL);
 
@@ -178,7 +260,13 @@ int main(){
             }
         }
         SDL_RenderCopy(ecran,hunter,&SrcR_hunter,&DestR_hunter);
+        SDL_RenderCopy(ecran,monster,&SrcR_monster,&DestR_monster);
         SDL_RenderPresent(ecran);  
+        
+        // chrono fin
+        
+        // attente 1000/30 - durée
+        
     }
     
     // Quitter SDL
