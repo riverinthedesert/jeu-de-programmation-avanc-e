@@ -9,7 +9,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
-#define SPEED 5
+#define SPEED 50
 /**
     * \brief La fonction rafrachit l'écran en fonction de touche de clavier
     * \param abs abscisse de hunter 
@@ -54,8 +54,8 @@
     
 /**
     * \brief monster deplace automatique
-    * \param abs abscisse de hunter 
-    * \param ord ordonne de hunter
+    * \param abs abscisse de monstre
+    * \param ord ordonne de monstre
     */
     void move_monster(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_monster){
         int t=rand()%4;
@@ -103,56 +103,44 @@
         
 /**
     * \brief balle deplace automatique
-    * \param abs abscisse de hunter 
-    * \param ord ordonne de hunter
+    * \param abs abscisse de balle 
+    * \param ord ordonne de balle
+    * \param abs1 abscisse de monstre 
+    * \param ord1 ordonne de monstre
+    * \param k si le monstre est tuee
     */
-void move_balle(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_balle,int* i){
-    printf("3\n");
-        printf("3\n");
+void move_balle(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_balle,int* i,int* abs1,int* ord1,SDL_Rect* DestR_monster,int* k){
         switch(dir)
             {
                 case 'h':
-//                     while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
-                        *ord=*ord-10;
-//                         sleep(1000);
-                        printf("h\n");
-            
+                        *ord=*ord-SPEED;
                 break;
                 case 'b':
-                        *ord=*ord+10;
-//                         sleep(1000);
-                        printf("b\n");
-    
+                        *ord=*ord+SPEED;
                 break;
                 case 'g':
-                        *abs=*abs-10;
-//                         sleep(1000);
-                        printf("g\n");
-                    
+                        *abs=*abs-SPEED;
                 break;
                 case 'd':
-                        *abs=*abs+10;
-//                         sleep(1000);
-                        printf("d\n");
-                
+                        *abs=*abs+SPEED;
                 break;
             }
-            if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
-            {
-                printf("s\n");
-                *i=0;
-            }
-        printf("a\n");
         (*DestR_balle).x =*abs;
         (*DestR_balle).y =*ord;
-//     if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
-//             {
-//                 *ord=-100;
-//                 *abs=-100;
-//                 DestR_balle[i].x =*abs;
-//                 DestR_balle[i].y =*ord;
-//                 SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
-//             }
+        if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
+            {
+                *i=0;
+                (*DestR_balle).x =-100;
+                (*DestR_balle).y =-100;
+            }
+        if(*abs<*abs1+64&&*ord<*ord1+64&&*abs>*abs1-64&&*ord>*ord1-64)//balle tue la monster
+        {
+            abs1=0;
+            ord1=0;
+            (*DestR_monster).x =-100;
+            (*DestR_monster).y =-100;
+            *k=1;
+        }
     
 }
 
@@ -315,6 +303,8 @@ int main(){
     
     int tempsfin = 0, tempsdebut = 0;
     int i=0; // si le balle est present
+    int dirb='b';// direction du balle
+    int k=0;  // si le monster est tuee
     // Boucle principale
     while(!terminer)
     {
@@ -348,9 +338,13 @@ int main(){
                          dir='d';
                                     break;
                     case SDLK_SPACE:
+                        if(i==0)
+                        {
                         abs2=abs;
                         ord2=ord;
+                        dirb=dir;
                         i=1;
+                        }
                                     break;
                      case SDLK_q:
                          terminer = true;  break;
@@ -358,12 +352,14 @@ int main(){
                  }
             }
         }
+        if(k==0)
+        {
+        move_monster(&abs1,&ord1,dir1,G,G2,&DestR_monster);
+        }
         if(i!=0)
         {
-            move_balle(&abs2,&ord2,dir,G,G2,&DestR_balle,&i);
+            move_balle(&abs2,&ord2,dirb,G,G2,&DestR_balle,&i,&abs1,&ord1,&DestR_monster,&k);
         }
-        printf("%d,%d",abs2,ord2);
-        move_monster(&abs1,&ord1,dir1,G,G2,&DestR_monster);
         refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&Mort_pos,&Restart_pos);
         SDL_RenderClear(ecran);
         SDL_RenderCopy(ecran,fond,NULL,NULL);
