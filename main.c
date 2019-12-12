@@ -15,7 +15,7 @@
     * \param abs abscisse de hunter 
     * \param ord ordonne de hunter
     */
-    void refresh_graphics(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_character,SDL_Rect* SrcR_character[4]){
+    void refresh_graphics(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_character,SDL_Rect* Mort_pos,SDL_Rect* Restart_pos){
     if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==8)
     {
         switch(dir)
@@ -37,25 +37,19 @@
     }
     if((int)G2[*ord/64][*abs/64]%16==3)
     {
-        switch(dir)
-                {
-                     case 'h':
-                         *ord=*ord+64; 
-                                     break;
-                     case 'b':
-                         *ord=*ord-64; 
-                                     break;
-                     case 'g':
-                         *abs=*abs+64; 
-                                     break;
-                     case 'd':
-                         *abs=*abs-64;
-                                    break;
-                    
-                 }
+
+                        (*Mort_pos).x = 400;
+                        (*Mort_pos).y = 350;
+                        (*Mort_pos).w = 224; // Largeur du texte en pixels (à récupérer)
+                        (*Mort_pos).h = 132; // Hauteur du texte en pixels (à récupérer)
+    
+                        (*Restart_pos).x = 462;
+                        (*Restart_pos).y = 487;
+                        (*Restart_pos).w = 100; // Largeur du texte en pixels (à récupérer)
+                        (*Restart_pos).h = 50; // Hauteur du texte en pixels (à récupérer)
     }
-    (*DestR_hunter).x =*abs;
-    (*DestR_hunter).y =*ord;
+    (*DestR_character).x =*abs;
+    (*DestR_character).y =*ord;
     }
     
 /**
@@ -217,6 +211,27 @@ int main(){
     DestR_monster.h = 64; // Hauteur du monster
 
     
+         
+    //charger le texte
+    TTF_Init();
+    TTF_Font *font = TTF_OpenFont("./arial.ttf",28);
+    SDL_Color color = {0,0,0,0};
+    char Mort[] = "Tu es mort";
+    char Restart[] ="Restart";
+    SDL_Texture* mort= charger_texte(Mort,ecran,font,color);
+    SDL_Texture* restart= charger_texte(Restart,ecran,font,color);
+    SDL_Rect Mort_pos; 
+    SDL_Rect Restart_pos;
+    // Position du texte
+    Mort_pos.x = -200;
+    Mort_pos.y = -200;
+    Mort_pos.w = 224; // Largeur du texte en pixels (à récupérer)
+    Mort_pos.h = 132; // Hauteur du texte en pixels (à récupérer)
+    
+    Restart_pos.x = -200;
+    Restart_pos.y = -200;
+    Restart_pos.w = 100; // Largeur du texte en pixels (à récupérer)
+    Restart_pos.h = 50; // Hauteur du texte en pixels (à récupérer)
     
     
     
@@ -261,7 +276,7 @@ int main(){
         }
         
         move_monster(&abs1,&ord1,dir1,G,G2,&DestR_monster);
-        refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&SrcR_character[4]);
+        refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&Mort_pos,&Restart_pos);
         SDL_RenderClear(ecran);
         SDL_RenderCopy(ecran,fond,NULL,NULL);
 
@@ -298,9 +313,17 @@ int main(){
                                     break;
                     
                  }
+        //Appliquer la surface du texte sur l’écran
+        SDL_RenderCopy(ecran,mort,NULL,&Mort_pos);
+        SDL_RenderCopy(ecran,restart,NULL,&Restart_pos);
         SDL_RenderPresent(ecran);  
+        
+        
         // chrono fin
         tempsfin = SDL_GetTicks();
+        
+        
+        
         // attente 2500/30 - durée
         SDL_Delay(2500/30 - (tempsfin - tempsdebut));
     }
@@ -311,6 +334,7 @@ int main(){
     SDL_Quit();
     
     // Fermer la police et quitter SDL_ttf
+    TTF_CloseFont( font );
     TTF_Quit();
     return 0;
 }
