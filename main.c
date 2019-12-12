@@ -9,7 +9,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
-
+#define SPEED 70
 /**
     * \brief La fonction rafrachit l'écran en fonction de touche de clavier
     * \param abs abscisse de hunter 
@@ -100,6 +100,59 @@
         (*DestR_monster).x =*abs;
         (*DestR_monster).y =*ord;
         }
+        
+/**
+    * \brief balle deplace automatique
+    * \param abs abscisse de hunter 
+    * \param ord ordonne de hunter
+    */
+void move_balle(SDL_Renderer* ecran,SDL_Texture* balle,int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* SrcR_balle,SDL_Rect* DestR_balle,int i){
+        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+        switch(dir)
+            {
+                case 'h':
+                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
+                        *ord=*ord-SPEED;
+                        DestR_balle[i].y =*ord;
+                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+                        sleep(1000);
+                    }
+                break;
+                case 'b':
+                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
+                        *ord=*ord+SPEED;
+                        DestR_balle[i].y =*ord;
+                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+                        sleep(1000);
+                    }
+                break;
+                case 'g':
+                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
+                        *abs=*abs-SPEED;
+                        DestR_balle[i].x =*abs;
+                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+                        sleep(1000);
+                    }
+                break;
+                case 'd':
+                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
+                        *abs=*abs+SPEED;
+                        DestR_balle[i].x =*abs;
+                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+                        sleep(1000);
+                    }
+                break;
+            }
+    if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
+            {
+                *ord=-100;
+                *abs=-100;
+                DestR_balle[i].x =*abs;
+                DestR_balle[i].y =*ord;
+                SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+            }
+    
+}
 
 
 int main(){
@@ -116,6 +169,10 @@ int main(){
     int abs1=640;
     int ord1=640;
     char dir1='d';
+    
+    int abs2=-100;
+    int ord2=-100;
+    
     srand(time(NULL));// Initialization
     // quartre option t=0: gauche t=1:haut t=2:droite t=3:bas
     
@@ -162,7 +219,9 @@ int main(){
     Uint8 r = 255, g = 255, b = 255;
     SDL_Texture* pavage= charger_image_transparente("pavage.bmp", ecran,r,g,b);   
     SDL_Texture* character= charger_image_transparente("weapon.bmp", ecran,r,g,b); 
-    SDL_Texture* monster= charger_image_transparente("eldritch.bmp", ecran,r,g,b);  
+    SDL_Texture* monster= charger_image_transparente("eldritch.bmp", ecran,r,g,b);
+    SDL_Texture* balle= charger_image_transparente("balle.bmp",ecran,r,g,b);
+    
     SDL_Rect SrcR_pavage[13][15];
      for(int i=0; i<13; i++)
     {
@@ -186,6 +245,7 @@ int main(){
         }
         
     }
+    
     SDL_Rect SrcR_character[4];
     for(int i=0; i<4; i++)
     {
@@ -199,6 +259,7 @@ int main(){
     DestR_character.y =ord;
     DestR_character.w = 64; // Largeur du hunter
     DestR_character.h = 64; // Hauteur du hunter
+    
     SDL_Rect SrcR_monster;
     SrcR_monster.x = 0;
     SrcR_monster.y = 0;
@@ -210,7 +271,22 @@ int main(){
     DestR_monster.w = 64; // Largeur du monster
     DestR_monster.h = 64; // Hauteur du monster
 
-    
+    SDL_Rect SrcR_balle[15];
+    for(int i=0; i<15; i++)
+    {  
+        SrcR_balle[i].x = 177;
+        SrcR_balle[i].y = 177;
+        SrcR_balle[i].w = 78; // Largeur du pavage
+        SrcR_balle[i].h = 78; // Hauteur du pavage
+    }
+    SDL_Rect DestR_balle[15];
+    for(int i=0; i<15; i++)
+    {  
+        DestR_balle[i].x = abs2;
+        DestR_balle[i].y = ord2;
+        DestR_balle[i].w = 20; // Largeur du pavage
+        DestR_balle[i].h = 20; // Hauteur du pavage
+    }
          
     //charger le texte
     TTF_Init();
@@ -234,12 +310,12 @@ int main(){
     Restart_pos.h = 50; // Hauteur du texte en pixels (à récupérer)
     
     
-    
-    
+    int tempsfin = 0, tempsdebut = 0;
+    int i=-1;
     // Boucle principale
     while(!terminer)
     {
-        int tempsfin = 0, tempsdebut = 0;
+
         // chrono début
         tempsdebut = SDL_GetTicks();
         while( SDL_PollEvent( &evenements ) )
@@ -268,6 +344,11 @@ int main(){
                          abs=abs+64;
                          dir='d';
                                     break;
+                    case SDLK_SPACE:
+                        DestR_balle[i].x=DestR_character.x+64;
+                        DestR_balle[i].y=DestR_character.y+32;
+                        i++;
+                                    break;
                      case SDLK_q:
                          terminer = true;  break;
                     
@@ -275,6 +356,7 @@ int main(){
             }
         }
         
+        move_balle(ecran,balle,&abs2,&ord2,dir,G,G2,&SrcR_balle[i],&DestR_balle[i],i);
         move_monster(&abs1,&ord1,dir1,G,G2,&DestR_monster);
         refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&Mort_pos,&Restart_pos);
         SDL_RenderClear(ecran);
