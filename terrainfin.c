@@ -19,27 +19,27 @@
     * \param p si le monstre  tue hunter
     */
     void refresh_graphics(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_character,SDL_Rect* Mort_pos,SDL_Rect* Restart_pos,int* abs1,int* ord1,int* p){
-    if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==8)
-    {
-        switch(dir)
-                {
-                     case 'h':
-                         *ord=*ord+64; 
+        if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==8)
+            {
+                switch(dir)
+                    {
+                        case 'h':
+                            *ord=*ord+64; 
                                      break;
-                     case 'b':
-                         *ord=*ord-64; 
+                        case 'b':
+                            *ord=*ord-64; 
                                      break;
-                     case 'g':
-                         *abs=*abs+64; 
+                        case 'g':
+                            *abs=*abs+64; 
                                      break;
-                     case 'd':
-                         *abs=*abs-64;
-                                    break;
+                        case 'd':
+                            *abs=*abs-64;
+                                     break;
                     
-                 }
-    }
-    if((int)G2[*ord/64][*abs/64]%16==3)
-    {
+                    }
+            }
+        if((int)G2[*ord/64][*abs/64]%16==3)
+            {
                         *p=1;
                         *abs=-100;
                         *ord=-100;
@@ -54,26 +54,25 @@
                         (*Restart_pos).y = 487;
                         (*Restart_pos).w = 100; // Largeur du texte en pixels (à récupérer)
                         (*Restart_pos).h = 50; // Hauteur du texte en pixels (à récupérer)
-    }
-    (*DestR_character).x =*abs;
-    (*DestR_character).y =*ord;
-    if(*abs<*abs1+64&&*ord<*ord1+64&&*abs>*abs1-64&&*ord>*ord1-64)//monstre tue hunter
-        {   
-            (*Mort_pos).x = 400;
-            (*Mort_pos).y = 350;
-            (*Mort_pos).w = 224; // Largeur du texte en pixels (à récupérer)
-            (*Mort_pos).h = 132; // Hauteur du texte en pixels (à récupérer)
-    
-            (*Restart_pos).x = 462;
-            (*Restart_pos).y = 487;
-            (*Restart_pos).w = 100; // Largeur du texte en pixels (à récupérer)
-            (*Restart_pos).h = 50; // Hauteur du texte en pixels (à récupérer)
-            *abs=-100;
-            *ord=-100;
-            (*DestR_character).x =-100;
-            (*DestR_character).y =-100;
-            *p=1;
-        }
+            }
+                    (*DestR_character).x =*abs;
+                    (*DestR_character).y =*ord;
+        if(*abs<*abs1+64&&*ord<*ord1+64&&*abs>*abs1-64&&*ord>*ord1-64)//monstre tue hunter
+            {   
+                (*Mort_pos).x = 400;
+                (*Mort_pos).y = 350;
+                (*Mort_pos).w = 224; // Largeur du texte en pixels (à récupérer)
+                (*Mort_pos).h = 132; // Hauteur du texte en pixels (à récupérer)
+                (*Restart_pos).x = 462;
+                (*Restart_pos).y = 487;
+                (*Restart_pos).w = 100; // Largeur du texte en pixels (à récupérer)
+                (*Restart_pos).h = 50; // Hauteur du texte en pixels (à récupérer)
+                *abs=-100;
+                *ord=-100;
+                (*DestR_character).x =-100;
+                (*DestR_character).y =-100;
+                *p=1;
+            }
     }
     
 /**
@@ -167,7 +166,7 @@ void move_balle(SDL_Window* fenetre,SDL_Renderer* ecran,int* abs,int* ord,char d
             SDL_DestroyRenderer(ecran);
             SDL_DestroyWindow(fenetre);
             SDL_Quit();
-            system("./commuter");
+            system("./start");
         }
     
 }
@@ -185,11 +184,11 @@ int main(){
     char dir='b'; // quartre option g: gauche h:haut d:droite b:bas
     
     int abs1=640;
-    int ord1=640;
+    int ord1=640;//initialisation de monstre
     char dir1='d';
     
     int abs2=-100;
-    int ord2=-100;
+    int ord2=-100;//initialisation de balle  on mettre dehors de la carte
     
     srand(time(NULL));// Initialization
     // quartre option t=0: gauche t=1:haut t=2:droite t=3:bas
@@ -224,13 +223,13 @@ int main(){
     SDL_Texture* fond= charger_image( "fond.bmp", ecran );
     
     //créer le terrain
-    taille_fichier("terrain.txt",&nbLig,&nbCol);
+    taille_fichier("terrain2.txt",&nbLig,&nbCol);
     G=allouer_tab_2D(nbLig,nbCol);
-    G=lire_fichier("terrain.txt");
+    G=lire_fichier("terrain2.txt");
     afficher_tab_2D(G,nbLig,nbCol);
-    taille_fichier("fire.txt",&nbLig,&nbCol);
+    taille_fichier("fire2.txt",&nbLig,&nbCol);
     G2=allouer_tab_2D(nbLig,nbCol);
-    G2=lire_fichier("fire.txt");
+    G2=lire_fichier("fire2.txt");
     afficher_tab_2D(G2,nbLig,nbCol);
     
     // Charger l’image avec la transparence
@@ -238,7 +237,6 @@ int main(){
     SDL_Texture* pavage= charger_image_transparente("pavage.bmp", ecran,r,g,b);   
     SDL_Texture* character= charger_image_transparente("weapon.bmp", ecran,r,g,b); 
     SDL_Texture* monster= charger_image_transparente("eldritch.bmp", ecran,r,g,b);
-
     SDL_Texture* balle= charger_image_transparente("balle.bmp",ecran,r,g,b);
     
     SDL_Rect SrcR_pavage[13][15];
@@ -369,7 +367,7 @@ int main(){
                          dir='d';
                                     break;
                     case SDLK_SPACE:
-                        if(i==0)
+                        if(i==0&&p==0)
                         {
                         abs2=abs;
                         ord2=ord;

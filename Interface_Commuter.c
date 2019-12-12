@@ -139,7 +139,7 @@ int main(){
                                 SDL_DestroyRenderer(ecran);
                                 SDL_DestroyWindow(fenetre);
                                 SDL_Quit();
-                                system("./terrain2");
+                                system("./terrainfin");
                             }
                             break;
                         case SDL_BUTTON_RIGHT:
