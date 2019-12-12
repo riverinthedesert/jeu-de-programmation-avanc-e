@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <stdbool.h>
@@ -40,13 +39,11 @@ int main(){
     int nbLig=0;
     int nbCol=0;
     char** G=allouer_tab_2D(nbLig,nbCol);
-    taille_fichier("Start.txt",&nbLig,&nbCol);
+    taille_fichier("Help.txt",&nbLig,&nbCol);
     G=allouer_tab_2D(nbLig,nbCol);
-    G=lire_fichier("Start.txt");
+    G=lire_fichier("Help.txt");
     afficher_tab_2D(G,nbLig,nbCol);
     
-   
-
     
     // Charger l’image avec la transparence
     Uint8 r = 255, g = 255, b = 255;
@@ -80,37 +77,28 @@ int main(){
         
     }
     
-
          
     //charger le texte
     TTF_Init();
     TTF_Font *font = TTF_OpenFont("./arial.ttf",28);
     SDL_Color color = {0,0,0,0};
-    char Jeu[] = "Hunter";
-    char Start[] ="Start";
-    char Help[]="Help";
-    SDL_Texture* jeu= charger_texte(Jeu,ecran,font,color);
-    SDL_Texture* start= charger_texte(Start,ecran,font,color);
-    SDL_Texture* help= charger_texte(Help,ecran,font,color);
-    SDL_Rect jeu_pos; 
-    SDL_Rect start_pos;
-    SDL_Rect help_pos;
+    char Continue[] = "Continue";
+    char Exit[] ="Exit";
+    SDL_Texture* continu= charger_texte(Continue,ecran,font,color);
+    SDL_Texture* exit= charger_texte(Exit,ecran,font,color);
+    SDL_Rect continue_pos; 
+    SDL_Rect exit_pos;
     // Position du texte
-    jeu_pos.x = 400;
-    jeu_pos.y = 128;
-    jeu_pos.w = 224; 
-    jeu_pos.h = 60; 
+    continue_pos.x = 400;
+    continue_pos.y = 128;
+    continue_pos.w = 224; // Largeur du texte en pixels (à récupérer)
+    continue_pos.h = 60; // Hauteur du texte en pixels (à récupérer)
     
-    start_pos.x = 450;
-    start_pos.y = 300;
-    start_pos.w = 124; 
-    start_pos.h = 60; 
-    
-    help_pos.x = 450;
-    help_pos.y = 400;
-    help_pos.w = 124; // Largeur du texte en pixels (à récupérer)
-    help_pos.h = 60; // Hauteur du texte en pixels (à récupérer)
-    
+    exit_pos.x = 450;
+    exit_pos.y = 300;
+    exit_pos.w = 124; // Largeur du texte en pixels (à récupérer)
+    exit_pos.h = 60; // Hauteur du texte en pixels (à récupérer)
+
     // Boucle principale
     while(!terminer)
     {
@@ -126,7 +114,8 @@ int main(){
             }
         }
         
-
+    
+       
         int x=0;
         int y=0;
         while( SDL_PollEvent( &evenements ) )
@@ -144,13 +133,13 @@ int main(){
                                 SDL_DestroyRenderer(ecran);
                                 SDL_DestroyWindow(fenetre);
                                 SDL_Quit();
-                                system("./main");
+                                system("./start");
                             }
-                            if(x>450&&x<574&&y>400&&y<460){
+                            if(x>400&&x<624&&y>128&&y<188){
                                 SDL_DestroyRenderer(ecran);
                                 SDL_DestroyWindow(fenetre);
                                 SDL_Quit();
-                                system("./help");
+                                system("./terrain2");
                             }
                             break;
                         case SDL_BUTTON_RIGHT:
@@ -158,9 +147,8 @@ int main(){
                 }
             }
        //Appliquer la surface du texte sur l’écran
-        SDL_RenderCopy(ecran,jeu,NULL,&jeu_pos);
-        SDL_RenderCopy(ecran,start,NULL,&start_pos);
-        SDL_RenderCopy(ecran,help,NULL,&help_pos);
+        SDL_RenderCopy(ecran,exit,NULL,&exit_pos);
+        SDL_RenderCopy(ecran,continu,NULL,&continue_pos);
         SDL_RenderPresent(ecran);  
     }
     
@@ -174,3 +162,5 @@ int main(){
     TTF_Quit();
     return 0;
 }
+
+

@@ -40,13 +40,11 @@ int main(){
     int nbLig=0;
     int nbCol=0;
     char** G=allouer_tab_2D(nbLig,nbCol);
-    taille_fichier("Start.txt",&nbLig,&nbCol);
+    taille_fichier("Help.txt",&nbLig,&nbCol);
     G=allouer_tab_2D(nbLig,nbCol);
-    G=lire_fichier("Start.txt");
+    G=lire_fichier("Help.txt");
     afficher_tab_2D(G,nbLig,nbCol);
     
-   
-
     
     // Charger l’image avec la transparence
     Uint8 r = 255, g = 255, b = 255;
@@ -80,36 +78,35 @@ int main(){
         
     }
     
-
          
     //charger le texte
     TTF_Init();
     TTF_Font *font = TTF_OpenFont("./arial.ttf",28);
     SDL_Color color = {0,0,0,0};
-    char Jeu[] = "Hunter";
-    char Start[] ="Start";
-    char Help[]="Help";
-    SDL_Texture* jeu= charger_texte(Jeu,ecran,font,color);
-    SDL_Texture* start= charger_texte(Start,ecran,font,color);
+    char Help[] = "Help";
+    char Ctn[] ="Movement:Toches directionnelles,Tirer:espace";
+    char Retour[]="Retour";
     SDL_Texture* help= charger_texte(Help,ecran,font,color);
-    SDL_Rect jeu_pos; 
-    SDL_Rect start_pos;
-    SDL_Rect help_pos;
+    SDL_Texture* ctn= charger_texte(Ctn,ecran,font,color);
+    SDL_Texture* retour= charger_texte(Retour,ecran,font,color);
+    SDL_Rect help_pos; 
+    SDL_Rect ctn_pos;
+    SDL_Rect retour_pos;
     // Position du texte
-    jeu_pos.x = 400;
-    jeu_pos.y = 128;
-    jeu_pos.w = 224; 
-    jeu_pos.h = 60; 
+    help_pos.x = 400;
+    help_pos.y = 128;
+    help_pos.w = 224; 
+    help_pos.h = 60; 
     
-    start_pos.x = 450;
-    start_pos.y = 300;
-    start_pos.w = 124; 
-    start_pos.h = 60; 
-    
-    help_pos.x = 450;
-    help_pos.y = 400;
-    help_pos.w = 124; // Largeur du texte en pixels (à récupérer)
-    help_pos.h = 60; // Hauteur du texte en pixels (à récupérer)
+    ctn_pos.x = 100;
+    ctn_pos.y = 300;
+    ctn_pos.w = 824; 
+    ctn_pos.h = 60; 
+
+    retour_pos.x = 900;
+    retour_pos.y = 700;
+    retour_pos.w = 100; 
+    retour_pos.h = 60; 
     
     // Boucle principale
     while(!terminer)
@@ -126,7 +123,7 @@ int main(){
             }
         }
         
-
+    
         int x=0;
         int y=0;
         while( SDL_PollEvent( &evenements ) )
@@ -140,17 +137,11 @@ int main(){
                         case SDL_BUTTON_LEFT:
                             x=evenements.button.x;
                             y=evenements.button.y;
-                            if(x>450&&x<574&&y>300&&y<360){
+                            if(x>900&&x<1000&&y>700&&y<760){
                                 SDL_DestroyRenderer(ecran);
                                 SDL_DestroyWindow(fenetre);
                                 SDL_Quit();
-                                system("./main");
-                            }
-                            if(x>450&&x<574&&y>400&&y<460){
-                                SDL_DestroyRenderer(ecran);
-                                SDL_DestroyWindow(fenetre);
-                                SDL_Quit();
-                                system("./help");
+                                system("./start");
                             }
                             break;
                         case SDL_BUTTON_RIGHT:
@@ -158,9 +149,9 @@ int main(){
                 }
             }
        //Appliquer la surface du texte sur l’écran
-        SDL_RenderCopy(ecran,jeu,NULL,&jeu_pos);
-        SDL_RenderCopy(ecran,start,NULL,&start_pos);
+        SDL_RenderCopy(ecran,ctn,NULL,&ctn_pos);
         SDL_RenderCopy(ecran,help,NULL,&help_pos);
+        SDL_RenderCopy(ecran,retour,NULL,&retour_pos);
         SDL_RenderPresent(ecran);  
     }
     
