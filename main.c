@@ -9,7 +9,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
-#define SPEED 70
+#define SPEED 5
 /**
     * \brief La fonction rafrachit l'écran en fonction de touche de clavier
     * \param abs abscisse de hunter 
@@ -106,51 +106,53 @@
     * \param abs abscisse de hunter 
     * \param ord ordonne de hunter
     */
-void move_balle(SDL_Renderer* ecran,SDL_Texture* balle,int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* SrcR_balle,SDL_Rect* DestR_balle,int i){
-        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+void move_balle(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_balle,int* i){
+    printf("3\n");
+        printf("3\n");
         switch(dir)
             {
                 case 'h':
-                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
-                        *ord=*ord-SPEED;
-                        DestR_balle[i].y =*ord;
-                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
-                        sleep(1000);
-                    }
+//                     while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
+                        *ord=*ord-10;
+//                         sleep(1000);
+                        printf("h\n");
+            
                 break;
                 case 'b':
-                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
-                        *ord=*ord+SPEED;
-                        DestR_balle[i].y =*ord;
-                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
-                        sleep(1000);
-                    }
+                        *ord=*ord+10;
+//                         sleep(1000);
+                        printf("b\n");
+    
                 break;
                 case 'g':
-                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
-                        *abs=*abs-SPEED;
-                        DestR_balle[i].x =*abs;
-                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
-                        sleep(1000);
-                    }
+                        *abs=*abs-10;
+//                         sleep(1000);
+                        printf("g\n");
+                    
                 break;
                 case 'd':
-                    while((int)G[*ord/64][*abs/64]%16!=7&&(int)G2[*ord/64][*abs/64]%16!=3&&(int)G2[*ord/64][*abs/64]%16!=8){
-                        *abs=*abs+SPEED;
-                        DestR_balle[i].x =*abs;
-                        SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
-                        sleep(1000);
-                    }
+                        *abs=*abs+10;
+//                         sleep(1000);
+                        printf("d\n");
+                
                 break;
             }
-    if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
+            if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
             {
-                *ord=-100;
-                *abs=-100;
-                DestR_balle[i].x =*abs;
-                DestR_balle[i].y =*ord;
-                SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+                printf("s\n");
+                *i=0;
             }
+        printf("a\n");
+        (*DestR_balle).x =*abs;
+        (*DestR_balle).y =*ord;
+//     if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==3||(int)G2[*ord/64][*abs/64]%16==8)
+//             {
+//                 *ord=-100;
+//                 *abs=-100;
+//                 DestR_balle[i].x =*abs;
+//                 DestR_balle[i].y =*ord;
+//                 SDL_RenderCopy(ecran,balle,&SrcR_balle[i],&DestR_balle[i]);
+//             }
     
 }
 
@@ -220,6 +222,7 @@ int main(){
     SDL_Texture* pavage= charger_image_transparente("pavage.bmp", ecran,r,g,b);   
     SDL_Texture* character= charger_image_transparente("weapon.bmp", ecran,r,g,b); 
     SDL_Texture* monster= charger_image_transparente("eldritch.bmp", ecran,r,g,b);
+
     SDL_Texture* balle= charger_image_transparente("balle.bmp",ecran,r,g,b);
     
     SDL_Rect SrcR_pavage[13][15];
@@ -271,22 +274,22 @@ int main(){
     DestR_monster.w = 64; // Largeur du monster
     DestR_monster.h = 64; // Hauteur du monster
 
-    SDL_Rect SrcR_balle[15];
-    for(int i=0; i<15; i++)
-    {  
-        SrcR_balle[i].x = 177;
-        SrcR_balle[i].y = 177;
-        SrcR_balle[i].w = 78; // Largeur du pavage
-        SrcR_balle[i].h = 78; // Hauteur du pavage
-    }
-    SDL_Rect DestR_balle[15];
-    for(int i=0; i<15; i++)
-    {  
-        DestR_balle[i].x = abs2;
-        DestR_balle[i].y = ord2;
-        DestR_balle[i].w = 20; // Largeur du pavage
-        DestR_balle[i].h = 20; // Hauteur du pavage
-    }
+    SDL_Rect SrcR_balle;
+//     for(int i=0; i<15; i++)
+//     {  
+        SrcR_balle.x = 177;
+        SrcR_balle.y = 177;
+        SrcR_balle.w = 45; // Largeur du pavage
+        SrcR_balle.h = 45; // Hauteur du pavage
+//     }
+    SDL_Rect DestR_balle;
+//     for(int i=0; i<15; i++)
+//     {  
+        DestR_balle.x = abs2;
+        DestR_balle.y = ord2;
+        DestR_balle.w = 20; // Largeur du pavage
+        DestR_balle.h = 20; // Hauteur du pavage
+//     }
          
     //charger le texte
     TTF_Init();
@@ -311,7 +314,7 @@ int main(){
     
     
     int tempsfin = 0, tempsdebut = 0;
-    int i=-1;
+    int i=0; // si le balle est present
     // Boucle principale
     while(!terminer)
     {
@@ -345,9 +348,9 @@ int main(){
                          dir='d';
                                     break;
                     case SDLK_SPACE:
-                        DestR_balle[i].x=DestR_character.x+64;
-                        DestR_balle[i].y=DestR_character.y+32;
-                        i++;
+                        abs2=abs;
+                        ord2=ord;
+                        i=1;
                                     break;
                      case SDLK_q:
                          terminer = true;  break;
@@ -355,13 +358,16 @@ int main(){
                  }
             }
         }
-        
-        move_balle(ecran,balle,&abs2,&ord2,dir,G,G2,&SrcR_balle[i],&DestR_balle[i],i);
+        if(i!=0)
+        {
+            move_balle(&abs2,&ord2,dir,G,G2,&DestR_balle,&i);
+        }
+        printf("%d,%d",abs2,ord2);
         move_monster(&abs1,&ord1,dir1,G,G2,&DestR_monster);
         refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&Mort_pos,&Restart_pos);
         SDL_RenderClear(ecran);
         SDL_RenderCopy(ecran,fond,NULL,NULL);
-
+        
         for(int i=0; i<nbLig; i++)
         {
             for(int j=0;j<nbCol;j++)
@@ -398,6 +404,7 @@ int main(){
         //Appliquer la surface du texte sur l’écran
         SDL_RenderCopy(ecran,mort,NULL,&Mort_pos);
         SDL_RenderCopy(ecran,restart,NULL,&Restart_pos);
+        SDL_RenderCopy(ecran,balle,&SrcR_balle,&DestR_balle);
         SDL_RenderPresent(ecran);  
         
         
