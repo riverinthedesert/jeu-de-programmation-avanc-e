@@ -14,8 +14,11 @@
     * \brief La fonction rafrachit l'écran en fonction de touche de clavier
     * \param abs abscisse de hunter 
     * \param ord ordonne de hunter
+    * \param abs1 abscisse de monstre 
+    * \param ord1 ordonne de monstre
+    * \param p si le monstre  tue hunter
     */
-    void refresh_graphics(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_character,SDL_Rect* Mort_pos,SDL_Rect* Restart_pos){
+    void refresh_graphics(int* abs,int* ord,char dir,char** G,char** G2,SDL_Rect* DestR_character,SDL_Rect* Mort_pos,SDL_Rect* Restart_pos,int* abs1,int* ord1,int* p){
     if((int)G[*ord/64][*abs/64]%16==7||(int)G2[*ord/64][*abs/64]%16==8)
     {
         switch(dir)
@@ -37,7 +40,11 @@
     }
     if((int)G2[*ord/64][*abs/64]%16==3)
     {
-
+                        *p=1;
+                        *abs=-100;
+                        *ord=-100;
+                        (*DestR_character).x =-100;
+                        (*DestR_character).y =-100;
                         (*Mort_pos).x = 400;
                         (*Mort_pos).y = 350;
                         (*Mort_pos).w = 224; // Largeur du texte en pixels (à récupérer)
@@ -50,6 +57,14 @@
     }
     (*DestR_character).x =*abs;
     (*DestR_character).y =*ord;
+    if(*abs<*abs1+64&&*ord<*ord1+64&&*abs>*abs1-64&&*ord>*ord1-64)//monstre tue hunter
+        {
+            *abs=-100;
+            *ord=-100;
+            (*DestR_character).x =-100;
+            (*DestR_character).y =-100;
+            *p=1;
+        }
     }
     
 /**
@@ -305,6 +320,7 @@ int main(){
     int i=0; // si le balle est present
     int dirb='b';// direction du balle
     int k=0;  // si le monster est tuee
+    int p=0;  // si le monster  tue hunter
     // Boucle principale
     while(!terminer)
     {
@@ -360,7 +376,10 @@ int main(){
         {
             move_balle(&abs2,&ord2,dirb,G,G2,&DestR_balle,&i,&abs1,&ord1,&DestR_monster,&k);
         }
-        refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&Mort_pos,&Restart_pos);
+        if(p==0)
+        {
+        refresh_graphics(&abs,&ord,dir,G,G2,&DestR_character,&Mort_pos,&Restart_pos,&abs1,&ord1,&p);
+        }
         SDL_RenderClear(ecran);
         SDL_RenderCopy(ecran,fond,NULL,NULL);
         
